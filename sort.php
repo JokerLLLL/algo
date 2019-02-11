@@ -230,6 +230,9 @@ class Sort{
         $i = $l + 1;      //arr[lt+1,i) == v;
         while ($i < $gt) {
             if($array[$i] < $v) {
+                if($i != $lt +1) { //含有相同元素时才互换位置
+                    list($array[$lt+1],$array[$i]) = array($array[$i],$array[$lt+1]);
+                }
                 $lt ++;
                 $i ++;
             }elseif ($array[$i] == $v) {
