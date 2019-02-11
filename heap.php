@@ -41,8 +41,11 @@ class Heap
         if($this->size < 1) {
             return Null;
         }
+        $temp_value = $this->heap[1];
         list($this->heap[$this->size],$this->heap[1]) = array($this->heap[1],$this->heap[$this->size]);
-
+        unset($this->heap[$this->size]);
+        $this->shiftDown(1);
+        return $temp_value;
     }
 
     /** 将index 排序 完成最大堆
@@ -59,6 +62,27 @@ class Heap
         }
     }
 
+    /**将第index索引的位置维护成最大堆
+     * @param $index
+     */
+    private function shiftDown($index)
+    {
+        //判断有左索引
+        while(2*$index <= $this->size) {
+            $change_index = 2*$index;
+            if(($change_index +1 <= $this->size) && ($this->heap[$change_index + 1] > $this->heap[$change_index])) {
+                $change_index += 1;
+            }
+            if($this->heap[$index] >= $this->heap[$change_index]) {
+                break;
+            }
+            //跟换位置 继续循环
+            list($this->heap[$change_index] , $this->heap[$index])
+                = array($this->heap[$index], $this->heap[$change_index]);
+
+            $index = $change_index;
+        }
+    }
 }
 $h = new Heap();
 for ($i=1;$i<10;$i++)
@@ -66,4 +90,7 @@ for ($i=1;$i<10;$i++)
     $h->insert(rand(1,10));
 }
 
+while (($value = $h->pop()) != null) {
+    var_dump($value);
+}
 var_dump($h->heap);
