@@ -85,9 +85,9 @@ class Heap
     }
 }
 $h = new Heap();
-for ($i=1;$i<10;$i++)
+for ($i=1;$i<100;$i++)
 {
-    $h->insert(rand(1,10));
+    $h->insert(rand(1,100));
 }
 
 while (($value = $h->pop()) != null) {
