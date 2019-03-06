@@ -247,75 +247,131 @@ class Sort{
         $this->partition2($array,$gt,$r);
     }
 
-}
+    /*堆的性质
+    parent(i) = floor((i+1)/2) - 1;
+    left(i) = 2*(i+1) - 1;
+    right = 2*(i+1);
+    //第一个不是叶子几点的堆
+    i = floor(count($array)/2) - 1;
 
-
-
-class HeapSort{
-
-
-    public function sort(&$array)
-    {
-        unset($array[0]);
-
-        for($i = floor(count($array)/2);$i >= 1;$i --) {
-//            var_dump($i);
-            $this->shiftDown($array,$i);
-        }
-//        var_dump($array);die;
-        $t = [0=>null];
-        while (($temp = $this->pop($array)) !== null) {
-                $t[] = $temp;
-        }
-//        var_dump($t)
-        unset($t[0]);
-        $array = $t;
-    }
-
-
-    /**将第index索引的位置维护成最大堆
+    /** 堆排序
      * @param $array
-     * @param $index
      */
-    private function shiftDown(&$array,$index)
+    private static function heapParent($i)
     {
-        //判断有左索引
-        while(2*$index <= count($array)) {
-            $change_index = 2*$index;
-            if(($change_index +1 <= count($array)) && ($array[$change_index + 1] > $array[$change_index])) {
-                $change_index += 1;
+        return floor(($i+1)/2) - 1;
+    }
+    private static function heapLeft($i)
+    {
+        return 2*($i+1) - 1;
+    }
+    private static function heapRight($i)
+    {
+        return 2*($i+1);
+    }
+    private static function heapLastNode(&$array)
+    {
+        return floor(count($array)/2) - 1;
+    }
+    private function shiftDown(&$array,$i,$end_index)
+    {
+        //有左孩子
+        while (self::heapLeft($i) <= $end_index) {
+            $change_index = self::heapLeft($i);
+            if((self::heapRight($i) <= $end_index)
+                && $array[self::heapRight($i)] < $array[self::heapLeft($i)]) {
+                $change_index = self::heapRight($i);
             }
-            if($array[$index] >= $array[$change_index]) {
+            if($array[$i] <= $array[$change_index])
                 break;
-            }
-            //跟换位置 继续循环
-            list($array[$change_index] , $array[$index])
-                = array($array[$index], $array[$change_index]);
-
-            $index = $change_index;
+            list($array[$i],$array[$change_index]) = array($array[$change_index],$array[$i]);
+            $i = $change_index;
         }
     }
-
-
-
-    public function pop(&$array)
+    private function pop(&$array,$do_index)
     {
-        if(count($array) < 1) {
-            return Null;
-        }
-        $temp_value =$array[1];
-        list($array[count($array)],$array[1]) = array($array[1],$array[count($array)]);
-        unset($array[count($array)]);
-        $this->shiftDown($array,1);
-        return $temp_value;
+        list($array[0],$array[$do_index]) = array($array[$do_index],$array[0]);
+        $this->shiftDown($array,0,$do_index -1);
     }
-
+    public function heapSort(&$array)
+    {
+         for($i = self::heapLastNode($array);$i >= 0;$i--) {
+              $this->shiftDown($array,$i,count($array) - 1);
+         }
+         for($j = count($array) - 1;$j > 0;$j--) {
+             $this->pop($array,$j);
+         }
+    }
 
 }
 
-$range = range(0,100,2);
-shuffle($range);
 
-$h = new HeapSort();
-$h->sort($range);
-var_dump($range);
+
+//class HeapSort{
+//
+//
+//    public function sort(&$array)
+//    {
+//        unset($array[0]);
+//
+//        for($i = floor(count($array)/2);$i >= 1;$i --) {
+////            var_dump($i);
+//            $this->shiftDown($array,$i);
+//        }
+////        var_dump($array);die;
+//        $t = [0=>null];
+//        while (($temp = $this->pop($array)) !== null) {
+//                $t[] = $temp;
+//        }
+////        var_dump($t)
+//        unset($t[0]);
+//        $array = $t;
+//    }
+//
+//
+//    /**将第index索引的位置维护成最大堆
+//     * @param $array
+//     * @param $index
+//     */
+//    private function shiftDown(&$array,$index)
+//    {
+//        //判断有左索引
+//        while(2*$index <= count($array)) {
+//            $change_index = 2*$index;
+//            if(($change_index +1 <= count($array)) && ($array[$change_index + 1] > $array[$change_index])) {
+//                $change_index += 1;
+//            }
+//            if($array[$index] >= $array[$change_index]) {
+//                break;
+//            }
+//            //跟换位置 继续循环
+//            list($array[$change_index] , $array[$index])
+//                = array($array[$index], $array[$change_index]);
+//
+//            $index = $change_index;
+//        }
+//    }
+//
+//
+//
+//    public function pop(&$array)
+//    {
+//        if(count($array) < 1) {
+//            return Null;
+//        }
+//        $temp_value =$array[1];
+//        list($array[count($array)],$array[1]) = array($array[1],$array[count($array)]);
+//        unset($array[count($array)]);
+//        $this->shiftDown($array,1);
+//        return $temp_value;
+//    }
+//
+//
+//}
+//
+//$range = range(0,100,2);
+//shuffle($range);
+//
+//$h = new HeapSort();
+//$h->sort($range);
+//var_dump($range);
