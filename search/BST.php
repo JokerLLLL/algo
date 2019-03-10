@@ -15,6 +15,9 @@ class Node{
 
 class BST
 {
+    /**
+     * @var $root Node
+     */
     public $root;
     public $count;
 
@@ -138,6 +141,8 @@ class BST
     }
 
 
+
+
     /**
      * 前序遍历
      */
@@ -218,9 +223,148 @@ class BST
     }
 
 
+    /** 层序遍历一遍
+     * @return array
+     */
     public function readFloor()
     {
+        $list = [$this->root];
+        $result = [];
+        while (!empty($list)) {
+            /**
+             *  错误使用了 array_pop  进行队列但弹出 发现了 前序便利的逆序方法
+             */
+
+            $this->__readFloor(array_shift($list), $list, $result);
+        }
+        return $result;
     }
+
+    private function __readFloor($node, &$list, &$result)
+    {
+        if ($node === null) {
+            return;
+        }
+        //左边入队
+        if ($node->left) {
+            array_push($list, $node->left);
+        }
+        //右边入队
+        if ($node->right) {
+            array_push($list, $node->right);
+        }
+        $result[] = $node->key;
+    }
+
+
+    public function delMin()
+    {
+        $this->__delMin($this->root);
+    }
+
+    /**
+     * @param $node Node
+     * @return null
+     */
+    private function __delMin(&$node)
+    {
+        if($node == null) {
+            return null;
+        }
+        if($node->left === null) {
+            if($node->right === null) {
+                //删除这个节点 不能用 unset
+                $node = null;
+            }else{
+                $node = $node->right;
+            }
+            $this->count --;
+        }else{
+            $this->__delMin($node->left);
+        }
+    }
+
+    public function delMax()
+    {
+        $this->__delMax($this->root);
+    }
+
+    /** 删除最右点
+     * @param $node Node
+     * @return null
+     */
+    private function __delMax(&$node)
+    {
+        if($node === null){
+            return null;
+        }
+        if($node->right === null) {
+            if($node->left === null) {
+                $node = null;
+            }else{
+                $node = $node->left;
+            }
+            $this->count --;
+        }else{
+            $this->__delMax($node->right);
+        }
+
+    }
+
+    public function delByKey($key)
+    {
+        $this->__delByKey($this->root,$key);
+    }
+
+    private function __delByKey(&$node,$key)
+    {
+         if($node === null) {
+             return null;
+         }
+         if(self::operation($key,$node->key) < 0) {
+             $this->__delByKey($node->left,$key);
+         }elseif (self::operation($key,$node->key) > 0) {
+             $this->__delByKey($node->right,$key);
+         }else{
+             //进行删除
+             if($node->left === null) {
+                 $node = $node->right;
+                 $this->count --;
+             }elseif ($node->right === null) {
+                 $node = $node->left;
+                 $this->count --;
+             }else{
+                 //左右都有孩子 删除 right 的 最小值并把最小值 赋给当前位置
+                 /**
+                  * @var $minNode Node
+                  */
+                $minNode = $this->__getMinNode($node->right); //获取右边最小值并代替当前位置
+                $this->__delMin($node->right);
+                $minNode->left = $node->left;
+                $minNode->right = $node->right;
+                $node = $minNode;
+                $this->count --;
+             }
+         }
+
+    }
+
+    /** 获取最小值的引用
+     * @param $node
+     * @return null
+     */
+    private function __getMinNode(&$node)
+    {
+        if($node == null) {
+            return null;
+        }
+        if($node->left === null) {
+            return $node;
+        }else{
+            return $this->__getMinNode($node->left);
+        }
+    }
+
 }
 
 
@@ -239,7 +383,14 @@ foreach ($a as $k => $v){
     }
 }
 //var_dump($tree->root);
-var_dump($tree->search('cccc'));
-var_dump($tree->readFront());
-var_dump($tree->readMid());
-var_dump($tree->readEnd());
+//var_dump($tree->search('cccc'));
+//var_dump($tree->readFront());
+//var_dump($tree->readMid());
+//var_dump($tree->readEnd());
+//var_dump($tree->readFloor());
+
+//$tree->delMin();
+
+$tree ->delByKey('c');
+$tree ->delByKey('cccc');
+var_dump($tree->root);
